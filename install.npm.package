@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+echo "----------------------------------------------"
+echo "---------  PACKAGE INSTALL SCRIPT  -----------"
+echo "----------------------------------------------"
+echo
+cd ./see
+npm install $1
