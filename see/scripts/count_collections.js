@@ -1,5 +1,5 @@
-const executePlugin = (db) => {}
+const executePlugin = (db) => {};
 
 export {
-    executePlugin
-}
+  executePlugin,
+};

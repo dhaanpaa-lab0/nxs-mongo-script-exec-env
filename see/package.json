@@ -14,8 +14,8 @@
     },
     "scripts": {
         "start": "node ./index.js",
-        "eslint": "eslint",
-        "eslint:fix": "eslint --fix"
+        "eslint": "eslint .",
+        "eslint:fix": "eslint --fix ."
     },
     "devDependencies": {
         "eslint": "^8.21.0",
