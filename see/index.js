@@ -1,6 +1,1 @@
-console.log({TEST_VAR:process.env.TEST_VAR})
-console.log("This is a test")
-console.time("Test")
-console.timeStamp("Test")
-console.log("This is another test")
-console.timeEnd("Test")
+recordStep()
