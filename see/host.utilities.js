@@ -1,6 +1,7 @@
 import fs from "fs";
 import YAML from "yaml";
 import * as path from "path";
+import glob from "glob";
 
 
 const getGlobalConfig = () => {
@@ -11,16 +12,32 @@ const getGlobalConfig = () => {
     return {};
 }
 
+
+const getPath = (p) => `${path.dirname(p).replaceAll("/",":")}`.toLowerCase()
+const getScriptKey = (p) => {
+    return (getPath(p) + ":" +  path.basename(p, '.js')).replace(".:scripts:","");
+}
 const getScriptList = () => {
-    const scripts = Object.fromEntries(fs
-        .readdirSync("./scripts")
-        .map(s => [path.basename(s,'.js'),`./scripts/${s}`]));
+    const scriptsToRun = glob.sync("./scripts/**/*.js");
+
+    console.log(scriptsToRun);
+    const scripts = Object.fromEntries(
+        scriptsToRun.map(s => [getScriptKey(s),s]))
 
     console.table(scripts);
     return scripts;
 }
 
+const loadAndExecuteScript = async (scr, db) => {
+    // Load Javascript file into plugin variable
+    const  plugin  = await import(scr)
+
+    // Execute exported function from javscript file
+    await plugin.executePlugin(db)
+}
+
 export {
     getGlobalConfig,
-    getScriptList
+    getScriptList,
+    loadAndExecuteScript
 }

@@ -3,8 +3,10 @@ import { config } from "dotenv-defaults";
 config();
 
 // 2... Load Functions needed
-import {getGlobalConfig, getScriptList} from "./host.utilities.js";
+import {getGlobalConfig, getScriptList, loadAndExecuteScript} from "./host.utilities.js";
 import {isEmptyObject} from "./utilities.js";
+import {MongoClient} from "mongodb";
+import {recordStep} from "./script.utilities.js";
 
 // 3... Load Non Environment Specific Configuration
 let globalConfig = getGlobalConfig();
@@ -44,4 +46,12 @@ if (!(hostConfig.scriptToExecute in scriptList)) {
 }
 
 let scriptsToBeExecuted = [...hostConfig.scripts_to_run_before, hostConfig.scriptToExecute, ...hostConfig.scripts_to_run_after]
+
+let mongoDatabaseClient = new MongoClient(hostConfig.mongoDbServer)
+for (const scriptsToBeExecutedKey in scriptsToBeExecuted) {
+    let scriptToExecute = scriptsToBeExecuted[scriptsToBeExecutedKey];
+    let scriptToExecuteFile = scriptList[scriptToExecute];
+
+    loadAndExecuteScript(scriptToExecuteFile, mongoDatabaseClient).then(r => recordStep(999, `Finished Executing "${scriptToExecute}"`));
+}
 console.log(scriptsToBeExecuted)
