@@ -1,0 +1,4 @@
+config:
+  scripts_to_run_before:
+    - verify_mongo_connection
+  scripts_to_run_after: []
