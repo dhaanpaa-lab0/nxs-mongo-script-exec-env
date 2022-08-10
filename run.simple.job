@@ -1,8 +1,20 @@
 #!/usr/bin/env bash
+
+if [ -z "$SEE_SCRIPT_NAME" ]; then
+    SEE_SCRIPT_NAME=$1
+fi
+
+if [ -z "$SEE_SCRIPT_NAME" ]; then
+    echo "----------------------------------------------"
+    echo "ERROR: Must specify script name using either command line or set SEE_SCRIPT_NAME"
+    echo "----------------------------------------------"
+    exit 1
+fi
+
 echo "----------------------------------------------"
 echo "--------- STARTING DATABASE SCRIPT -----------"
 echo "----------------------------------------------"
-echo
+echo "Executing Script: $SEE_SCRIPT_NAME"
 cd ./see
-npm run start
+npm run start $SEE_SCRIPT_NAME
 exit 0

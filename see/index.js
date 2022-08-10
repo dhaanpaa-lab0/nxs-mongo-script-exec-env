@@ -1,11 +1,12 @@
-// 1... Load Sensitive Environment Defaults
+// 1... Load Environemnt Specific Configuration
 import { config } from "dotenv-defaults";
 config();
 
-import {recordStep, recordTimeEnd, recordTimeStart} from "./script.utilities.js";
+// 2... Load Functions needed
 import {getGlobalConfig, getScriptList} from "./host.utilities.js";
 import {isEmptyObject} from "./utilities.js";
 
+// 3... Load Non Environment Specific Configuration
 let globalConfig = getGlobalConfig();
 if (isEmptyObject(globalConfig)) {
     console.error("Configuration File Not Found")
@@ -13,16 +14,30 @@ if (isEmptyObject(globalConfig)) {
 
 }
 
+// 4... Combine Host and environment configuration
+let hostConfig = {
+    scriptToExecute: process.argv[2],
+    mongoDbServer: process.env.MONGO_SERVER,
+    ...globalConfig
+}
 
-console.table({
-    mongoDbServer: process.env.MONGO_SERVER
-});
 
-console.log(getScriptList())
+let scriptList = getScriptList();
+console.log(Object.keys(scriptList));
+console.log(hostConfig)
 
-recordTimeStart(1)
-recordStep(1, "This is a test message")
-recordStep(1, "Configuration")
-recordStep(1,globalConfig)
+// 5... Check if script requested is in script list and not in special scripts list
+if (hostConfig.scriptToExecute in hostConfig.scripts_to_run_before) {
+    console.error("ERROR: Cannot request to run script that is in scripts_to_run_before config array")
+    process.exit(1)
+}
 
-recordTimeEnd(1)
+if (hostConfig.scriptToExecute in hostConfig.scripts_to_run_after) {
+    console.error("ERROR: Cannot request to run script that is in scripts_to_run_after config array")
+    process.exit(1)
+}
+
+if (!(hostConfig.scriptToExecute in scriptList)) {
+    console.error("ERROR: Cannot request to run script that does not exist")
+    process.exit(1)
+}
