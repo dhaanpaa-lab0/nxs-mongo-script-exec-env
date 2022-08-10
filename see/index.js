@@ -45,15 +45,31 @@ if (hostConfig.scripts_to_run_after.includes(hostConfig.scriptToExecute)) {
   process.exit(1);
 }
 
-if (!(hostConfig.scriptToExecute in scriptList)) {
-  console.error('ERROR: Cannot request to run script that does not exist');
-  process.exit(1);
+
+let scriptsToBeExecuted;
+if (hostConfig.scriptToExecute.endsWith(':')) {
+  // Get Scripts that are in script group
+  const scriptsInGroup = Object.keys(scriptList).filter((m) => m.startsWith(
+      hostConfig.scriptToExecute,
+  ));
+
+  // Set Scripts to be executed variable
+  scriptsToBeExecuted = [
+    ...hostConfig.scripts_to_run_before,
+    ...scriptsInGroup,
+    ...hostConfig.scripts_to_run_after];
+} else {
+  if ( (!(hostConfig.scriptToExecute in scriptList))) {
+    console.error('ERROR: Cannot request to run script that does not exist');
+    process.exit(1);
+  }
+
+  scriptsToBeExecuted = [
+    ...hostConfig.scripts_to_run_before,
+    hostConfig.scriptToExecute,
+    ...hostConfig.scripts_to_run_after];
 }
 
-const scriptsToBeExecuted = [
-  ...hostConfig.scripts_to_run_before,
-  hostConfig.scriptToExecute,
-  ...hostConfig.scripts_to_run_after];
 
 const mongoDatabaseClient = new MongoClient(hostConfig.mongoDbServer);
 scriptsToBeExecuted.forEach((scriptToExecute) => {
